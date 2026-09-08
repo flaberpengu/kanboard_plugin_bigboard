@@ -70,7 +70,7 @@ class Plugin extends Base
 
     public function getPluginHomepage()
     {
-        return 'https://github.com/BlueTeck/kanboard_plugin_bigboard';
+        return 'https://github.com/flaberpengu/kanboard_plugin_bigboard';
     }
 
     public function getCompatibleVersion()
