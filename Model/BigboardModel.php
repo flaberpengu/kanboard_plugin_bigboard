@@ -158,9 +158,11 @@ class BigboardModel extends Base
     {
         $max = $this->db->table(self::SELTABLE)
             ->eq('user_id', $user_id)
-            ->max('position');
+            ->desc('position')
+            ->limit(1)
+            ->findOneColumn('position');
 
-        return $max !== false ? (int) $max : 0;
+        return $max !== false && $max !== null ? (int) $max : 0;
     }
 
 	// COLLAPSE methods :

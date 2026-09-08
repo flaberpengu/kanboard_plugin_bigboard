@@ -157,6 +157,10 @@ class Bigboard extends BaseController
         }
 
         usort($ProjectList, function($a, $b) {
+            if ($a['position'] == $b['position']) {
+                return $a['id'] - $b['id'];
+            }
+
             return $a['position'] - $b['position'];
         });
 

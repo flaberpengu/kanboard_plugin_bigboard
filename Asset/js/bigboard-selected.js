@@ -16,30 +16,45 @@ $(document).ready(function() {
         $("input[type='checkbox']:checked").click();
         $("input[type='checkbox'][class='fav']:not(:checked)").click();
     });
-
-    // project list drag-and-drop reordering
-    if ($("#bigboard-project-list").length) {
-        $("#bigboard-project-list").sortable({
-            items: ".selitem",
-            handle: ".drag-handle",
-            placeholder: "sortable-placeholder",
-            tolerance: "pointer",
-            stop: function(event, ui) {
-                var projectId = ui.item.attr('data-project-id');
-                var position = ui.item.index() + 1;
-
-                $.ajax({
-                    cache: false,
-                    url: '?controller=BoardAjaxController&action=moveProject&plugin=Bigboard',
-                    contentType: "application/json",
-                    type: "POST",
-                    processData: false,
-                    data: JSON.stringify({
-                        "project_id": projectId,
-                        "position": position
-                    })
-                });
-            }
-        });
-    }
 });
+
+function bigboardInitSortable() {
+    var list = $("#bigboard-project-list");
+
+    if (!list.length || list.hasClass('ui-sortable')) {
+        return;
+    }
+
+    list.sortable({
+        items: ".selitem",
+        handle: ".drag-handle",
+        placeholder: "sortable-placeholder",
+        tolerance: "pointer",
+        stop: function(event, ui) {
+            // only selected (checked) projects have a meaningful position
+            if (!ui.item.find('input:checked').length) {
+                return;
+            }
+
+            var projectId = ui.item.attr('data-project-id');
+            var position = ui.item.prevAll('.selitem:has(input:checked)').length + 1;
+
+            $.ajax({
+                cache: false,
+                url: '?controller=BoardAjaxController&action=moveProject&plugin=Bigboard',
+                contentType: "application/json",
+                type: "POST",
+                processData: false,
+                data: JSON.stringify({
+                    "project_id": projectId,
+                    "position": position
+                })
+            });
+        }
+    });
+}
+
+if (typeof KB !== 'undefined') {
+    KB.on('dom.ready', bigboardInitSortable);
+    KB.on('modal.afterRender', bigboardInitSortable);
+}
