@@ -1,20 +1,22 @@
 # Kanboard Plugin Bigboard
 
-A Kanboard that can display multiple projects.
+A Kanboard that can display multiple projects. This is a fork from [TimoStahl's fork](https://github.com/TimoStahl/kanboard_plugin_bigboard) to add some minor QoL improvements and personal feature desires.
 
-This software is in maintenance mode. It doesn't mean it's abandoned, but there is no significant feature development. Pull-requests are still accepted as long as the guidelines are followed.
+## AI Usage
 
-Plugin for <https://github.com/kanboard/kanboard>
+All (or the vast majority) of the features and changes I have made are made using AI tools, since I do not understand PHP or Javascript enough and do not particularly wish to at this time. The aim of this is to add some minor tweaks for my own personal use.
 
-## Author
+## Changes and Features
 
-- [BlueTeck](https://github.com/BlueTeck)
-- [Pierre Cadeot](https://github.com/pcadeot)
-- [PapeCoding](https://github.com/PapeCoding)
-- [Chaosmeister](https://github.com/Chaosmeister)
-- [Jake G](https://github.com/jieiku)
-- based on Bigboard by [Thomas Stinner](https://github.com/stinnux)
-- License MIT
+- Default Kanboard to filter to open issues only.
+  - If the user chooses filters, some buttons respect that.
+  - Any heading buttons that direct you to the Bigboard page from a non-Bigboard page now apply the open issues filter my default.
+- Kanboards within the Bigboard can now be re-ordered and more easily deselected.
+  - Controlled in the same style as swimlines in an individual Kanboard.
+
+## License
+
+As per the repo this is forked from, the license of this plugin is MIT.
 
 ## Installation
 
