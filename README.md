@@ -20,9 +20,9 @@ As per the repo this is forked from, the license of this plugin is MIT.
 
 ## Installation
 
-- Decompress the archive in the `plugins` folder
+- Decompress the archive in the `plugins` folder.
 
 or
 
-- Create a folder **plugins/Bigboard**
-- Copy all files under this directory
+- Create a folder **plugins/Bigboard**.
+- Copy all files under this directory.
