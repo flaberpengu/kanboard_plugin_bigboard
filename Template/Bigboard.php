@@ -4,6 +4,6 @@
         t('BigBoard'),
         'Bigboard',
         'index',
-        ['plugin' => 'Bigboard', ]
+        ['plugin' => 'Bigboard', 'search' => 'status:open', ]
     ) ?>
 </li>
