@@ -32,17 +32,28 @@ class Bigboard extends BaseController
     public function saveList()
     {
         $user = $this->getUser();
-        // clear all selected
-        $status = $this->bigboardModel->selectClear($user['id']);
+        $current_selection = $this->bigboardModel->selectFindAllProjectsById($user['id']);
+
         if (isset($_POST['selection'])) {
-            $selection = $_POST['selection'];
-            sort($selection);
-            // take each project from selection
-            foreach ($selection as $selected) {
-                $status = $this->bigboardModel->selectTake($selected, $user['id']);
+            $new_selection = $_POST['selection'];
+
+            $to_remove = array_diff($current_selection, $new_selection);
+            foreach ($to_remove as $project_id) {
+                $this->bigboardModel->selectDrop(
+                    $this->bigboardModel->selectFind($project_id, $user['id'])['id']
+                );
             }
+
+            $to_add = array_diff($new_selection, $current_selection);
+            foreach ($to_add as $project_id) {
+                $this->bigboardModel->selectTake($project_id, $user['id']);
+            }
+        } else {
+            $this->bigboardModel->selectClear($user['id']);
         }
-        // if called from bigboard view so refresh it
+
+        $this->bigboardModel->updatePositions($user['id']);
+
         if (isset($_POST['boardview'])) {
             return $this->response->redirect($this->helper->url->to('Bigboard', 'index', ['plugin' => 'Bigboard']));
         }
@@ -133,15 +144,21 @@ class Bigboard extends BaseController
         foreach ($project_ids as $project_id) {
             $project = $this->projectModel->getByIdWithOwner($project_id);
             $search = $this->helper->projectHeader->getSearchQuery($project);
+            $selected = $this->bigboardModel->selectFind($project_id, $this->userSession->getId());
 
             $this->userMetadataCacheDecorator->set(UserMetadataModel::KEY_BOARD_COLLAPSED.$project_id, $this->userSession->isBigboardCollapsed());
 
             $Project['id'] = $project_id;
             $Project['nom'] = $project['name'];
             $Project['is_private'] = $project['is_private'];
+            $Project['position'] = $selected ? $selected['position'] : 0;
 
             $ProjectList[] = $Project;
         }
+
+        usort($ProjectList, function($a, $b) {
+            return $a['position'] - $b['position'];
+        });
 
         echo $this->template->render('bigboard:board/list', ['projectList' => $ProjectList]);
     }

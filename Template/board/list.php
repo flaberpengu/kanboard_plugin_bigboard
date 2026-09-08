@@ -27,7 +27,9 @@ if (isset($_GET['boardview'])) {
 
 $storedList = $this->app->bigboardModel->selectFindAllProjectsById($this->user->getId());
 (count($storedList) > 0) ? sort($storedList) : null;
-sort($projectList);
+?>
+<div id="bigboard-project-list">
+<?php
 foreach ($projectList as $project) {
     if ((null != $storedList) && (in_array($project['id'], $storedList))) {
         $stored = 'checked';
@@ -51,7 +53,8 @@ foreach ($projectList as $project) {
     } else {
         $priv = '';
     } ?>
-<div class="selitem" style="display: block;">
+<div class="selitem" data-project-id="<?php echo $project['id']; ?>" style="display: block;">
+<span class="drag-handle"><i class="fa fa-arrows-alt" title="<?php echo t('Change position'); ?>"></i></span>
 <label class="sel">
 <input type="checkbox" name="selection[]" class="<?php echo $class; ?>" value="<?php echo $project['id']; ?>" <?php echo $stored; ?>>
   <span> <small>#<?php echo $this->text->e($project['id']); ?></small> <?php echo $fav; ?> <?php echo $project['nom']; ?> <?php echo $priv; ?> </span> 
@@ -60,6 +63,7 @@ foreach ($projectList as $project) {
 
 <?php
 } ?>
+</div>
         <?php echo $this->modal->submitButtons(); ?>
     </form>
 </section>	 

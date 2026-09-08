@@ -34,13 +34,14 @@ class BigboardModel extends Base
         $selectedProjects = $this->db->table(self::SELTABLE)
             ->eq('user_id', $user_id)
             ->in('project_id', $this->db->table(ProjectModel::TABLE)->findAllByColumn('id'))
+            ->asc('position')
+            ->asc('id')
             ->findAll();
 
         $projects = array();
         foreach ($selectedProjects as $selectedProject) {
             $projects[] = $selectedProject['project_id'];
         }
-		sort($projects);
         return $projects;
     }
 
@@ -57,9 +58,11 @@ class BigboardModel extends Base
 
     public function selectTake($project_id, $user_id)
     {
+        $position = $this->getMaxPosition($user_id) + 1;
         $status = $this->db->table(self::SELTABLE)->insert(array(
             'project_id' => $project_id,
             'user_id' => $user_id,
+            'position' => $position,
         ));
 
         error_log("BB selectTake STATUS = $status / project $project_id taken for user $user_id ");
@@ -88,6 +91,77 @@ class BigboardModel extends Base
 
         return !$status;
 	}
+
+    public function changePosition($user_id, $project_id, $position)
+    {
+        $count = $this->db->table(self::SELTABLE)
+            ->eq('user_id', $user_id)
+            ->count();
+
+        if ($position < 1 || $position > $count) {
+            return false;
+        }
+
+        $projectIds = $this->db->table(self::SELTABLE)
+            ->eq('user_id', $user_id)
+            ->neq('project_id', $project_id)
+            ->asc('position')
+            ->asc('id')
+            ->findAllByColumn('project_id');
+
+        $offset = 1;
+        $results = array();
+
+        foreach ($projectIds as $currentProjectId) {
+            if ($offset == $position) {
+                $offset++;
+            }
+            $results[] = $this->db->table(self::SELTABLE)
+                ->eq('user_id', $user_id)
+                ->eq('project_id', $currentProjectId)
+                ->update(array('position' => $offset));
+            $offset++;
+        }
+
+        $results[] = $this->db->table(self::SELTABLE)
+            ->eq('user_id', $user_id)
+            ->eq('project_id', $project_id)
+            ->update(array('position' => $position));
+
+        return !in_array(false, $results, true);
+    }
+
+    public function updatePositions($user_id)
+    {
+        $position = 0;
+        $projects = $this->db->table(self::SELTABLE)
+            ->eq('user_id', $user_id)
+            ->asc('position')
+            ->asc('id')
+            ->findAllByColumn('project_id');
+
+        if (!$projects) {
+            return false;
+        }
+
+        foreach ($projects as $project_id) {
+            $this->db->table(self::SELTABLE)
+                ->eq('user_id', $user_id)
+                ->eq('project_id', $project_id)
+                ->update(array('position' => ++$position));
+        }
+
+        return true;
+    }
+
+    public function getMaxPosition($user_id)
+    {
+        $max = $this->db->table(self::SELTABLE)
+            ->eq('user_id', $user_id)
+            ->max('position');
+
+        return $max !== false ? (int) $max : 0;
+    }
 
 	// COLLAPSE methods :
 	// manage status of projects which display as collapsed (or else expanded) on the bigboard view

@@ -161,6 +161,27 @@ class BoardAjaxController extends BaseController
     }
 
     /**
+     * Reorder project on bigboard selection page.
+     */
+    public function moveProject()
+    {
+        $user = $this->getUser();
+        $values = $this->request->getJson();
+
+        if (empty($values) || !isset($values['project_id']) || !isset($values['position'])) {
+            throw new AccessForbiddenException();
+        }
+
+        $result = $this->bigboardModel->changePosition(
+            $user['id'],
+            $values['project_id'],
+            $values['position']
+        );
+
+        $this->response->json(['result' => $result]);
+    }
+
+    /**
      * Render board.
      *
      * @param int $project_id

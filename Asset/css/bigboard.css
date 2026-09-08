@@ -41,3 +41,20 @@ div.selitem input[type=checkbox]:checked + span {
 label.sel {
     margin-top: -1px;
 }
+
+.drag-handle {
+    cursor: move;
+    color: #999;
+    margin-right: 4px;
+}
+
+.drag-handle:hover {
+    color: #333;
+}
+
+.sortable-placeholder {
+    border: 2px dashed #ccc;
+    background: rgba(200,200,200,0.1);
+    margin-bottom: 4px;
+    min-height: 28px;
+}
